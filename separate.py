@@ -297,6 +297,33 @@ def separate(gt_m,
              verbose=True,
              gradient_weight=1,
              device=device):
+    """
+    Implementation of Modified BASIS.
+
+    Args:
+        gt_m (torch.Tensor): Mixed signal.
+        hps (dict): Hyperparameters of VAE.
+        L (int): Number of iterations per noise level.
+        T (int): Number of noise levels.
+        alpha (float): Mixing coefficient.
+        delta (float): Learning rate.
+        image_h (int): Height of image.
+        image_w (int): Width of image.
+        sigma_start (float): Smallest noise level.
+        sigma_end (float): Largest noise level.
+        stem_indices (list): Indices of the stem types within the image.
+        finetuned (bool): True if the finetuned models shall be used.
+        name (str): Name of the super-VAE.
+        visualise (bool): True if a figure of the separation shall be saved.
+        k (int): Number of sources.
+        constraint_term_weight (int): Weight to the reconstruction term.
+        verbose (bool): True if progress report should be printed.
+        gradient_weight (float): Weight to the gradient.
+        device (str): 'cpu' or 'cuda'.
+
+    Returns:
+        list: Separated sources as torch.Tensor each.
+    """
 
     x_dim = image_h * image_w
 
@@ -381,12 +408,7 @@ def separate(gt_m,
 
             del epsilon_t, u, constraint_term, elongated_constraint_term, log_p_x_z, grad_log_p_x_z
 
-
         xz_chain.append(xz.cpu())
-
-        # for vis_idx in range(k):
-            # x = extract_x(xz_chain[-1], vis_idx, x_dim=x_dim, z_dim=z_dim).view(image_h, image_w)
-            # save_image(x, f'images/0_recon_stem_{vis_idx + 1}_gen{i}.png')
 
         if verbose:
             print(f'Appended {i + 1}/{L}')

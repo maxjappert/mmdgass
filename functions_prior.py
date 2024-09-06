@@ -5,15 +5,10 @@ import math
 import os
 import pickle
 import random
-
-import cv2
 import mir_eval.separation
 import numpy as np
 import torch
-import torch.nn as nn
-import torchaudio
 from PIL import Image
-from torch.distributions import Normal, kl_divergence
 from torch.nn import BCEWithLogitsLoss, L1Loss, MSELoss, BCELoss
 from torch.optim.lr_scheduler import CyclicLR
 from torch.utils.data import Dataset, DataLoader
@@ -27,14 +22,27 @@ from torchvision.utils import save_image
 
 from models.cnn_ae_2d_spectrograms import *
 
-from evaluation_metric_functions import compute_spectral_metrics
 from functions import metric_index_mapping, save_spectrogram_to_file, get_total_loss
-from new_vae import NewVAE
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 class MultiModalDataset(Dataset):
+    """
+    Dataset for incorporating video.
+    """
     def __init__(self, split, image_h=64, image_w=64, video_h=128, video_w=128, debug=False, normalise=False, fps=30):
+        """
+        Args:
+            split (str): ['train', 'val', 'test'].
+            image_h (int): Height of image.
+            image_w (int): Width of image.
+            video_h (int): Height of video.
+            video_w (int): Width of video.
+            debug (bool): True if reduced number of data points.
+            normalise (bool): True if video frames should be normalised into [0, 1].
+            fps (int): Processed frames per second. Original is 30.
+        """
         self.video_master_path = os.path.join('data', 'rochester_preprocessed', split)
         self.datapoints = os.listdir(self.video_master_path)[::2] if not debug else os.listdir(self.video_master_path)[::40]
 
@@ -170,6 +178,15 @@ class MultiModalDataset(Dataset):
                }
 
 def save_tensor_image_to_png(image_tensor, filename):
+    """
+    Saves a tensor to image on disk.
+    Args:
+        image_tensor (torch.Tensor): Original tensor.
+        filename (str): Name of the file.
+
+    Returns:
+
+    """
     image_tensor = image_tensor.permute(1, 2, 0)
 
     # Convert the tensor to a NumPy array and scale to [0, 255]
@@ -234,6 +251,10 @@ class SDRLoss(torch.nn.Module):
 
 
 class PriorDatasetVideo(Dataset):
+    """
+    Preprocessed URMP dataset.
+    """
+
     def __init__(self, split, debug=False, image_h=64, image_w=64, sigma=None, stem_type=None):
         self.data_point_names = []
         self.master_path = os.path.join('data', 'rochester_preprocessed', split)
@@ -277,8 +298,6 @@ class PriorDatasetVideo(Dataset):
 
 
     def __getitem__(self, idx):
-
-        #print(np.array(Image.open(os.path.join(self.master_path, self.data_point_names[idx] + '.png'))).mean(axis=-1).shape)
 
         if idx > len(self.data_point_names)-1:
             print('Index too high.')
@@ -426,13 +445,12 @@ def compute_size(size, num_layers, stride, kernel_size, padding):
 
 # Define the VAE
 class VAE(nn.Module):
+    """
+    VAE used as a deep generative prior.
+    """
+
     def __init__(self, latent_dim=64, channels=[32, 64, 128, 256, 512], use_blocks=True, image_h=1024, image_w=384, kernel_sizes=None, strides=None, batch_norm=False, num_input_channels=1):
         super(VAE, self).__init__()
-        #self.encoder = models.resnet18(weights=None)
-        #self.encoder.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
-        #num_output_features = self.encoder.fc.in_features
-        #self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])  # Remove the final fc layer
-
         self.image_h = image_h
         self.image_w = image_w
 

@@ -15,7 +15,7 @@ from nmf import nmf_approx_two_sources
 from evaluation_metric_functions import compute_spectral_sdr, compute_spectral_metrics
 from functions import get_non_linear_separation, model_factory, get_linear_separation, get_model
 from functions_prior import PriorDataset
-from separate_new import separate, get_vaes
+from separate import separate, get_vaes
 
 # Define the seed
 seed = 42
@@ -40,14 +40,37 @@ torch.backends.cudnn.benchmark = False
 
 np.set_printoptions(precision=3, suppress=True)
 
+
 def print_output(results, k, metric_idx, name, index=-2):
+    """
+    Used for printing the mean +- std.
+
+    Args:
+        results (ndarray): Results tensor used to compute the mean and standard deviation.
+        k (int): Number of sources.
+        metric_idx (int): Index of the metric to print.
+        name (str): Name for formatting.
+        index (int): Maximum sample index.
+    """
     for stem_idx in range(k):
         print(
             f'{name} {stem_idx + 1}: {round(np.mean(results[stem_idx, metric_idx, :index+1]), 3)} +- {round(np.std(results[stem_idx, metric_idx, :index+1]), 3)}')
 
     print()
 
+
 def experiment(name_vae, device, num_samples=450):
+    """
+    Conducts an experiment comparing all methods with respect to the SDR, ISR, SIR and SAR metrics.
+
+    Args:
+        name_vae (str): Name of VAE.
+        device (str): 'cpu' or 'cuda'.
+        num_samples (int): Number of samples for each method.
+
+    Returns:
+
+    """
     print(f'Experiment started for {name_vae}')
 
     k = 2

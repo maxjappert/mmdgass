@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from evaluation_metric_functions import compute_spectral_sdr
 from functions import model_factory, CircleTriangleDataset, train, test, TwoSourcesDataset
 from functions_prior import PriorDataset, train_vae, SDRLoss
-from separate_new import evaluate_basis_ability
+from separate import evaluate_basis_ability
 
 
 def hp_opti_basis(name='toy', n_trials=100):

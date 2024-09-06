@@ -9,7 +9,6 @@ from scipy.io import wavfile
 import mir_eval
 
 from audio_spectrogram_conversion import spectrogram_to_audio, audio_to_spectrogram
-from evaluation_metric_functions import compute_spectral_sdr
 from functions import load_model, TwoSourcesDataset, test, get_linear_separation, get_reconstruction, \
     save_spectrogram_to_file
 
@@ -113,8 +112,3 @@ for _ in range(5):
     print('\nMir_eval_SDR:')
     print(mir_eval.separation.bss_eval_sources(np.vstack([wav_gt_s1, wav_gt_s2]), np.vstack([wav_recon_s1, wav_recon_s2])))
     print('\n')
-
-#print(mir_eval.separation.bss_eval_sources(np.vstack([wav_gt_s1, wav_gt_s2]), np.vstack([wav_recon_s1, wav_recon_s2])))
-#print(mir_eval.separation.bss_eval_sources(np.vstack([wav_gt_s2, wav_gt_s1]), np.vstack([wav_recon_s1, wav_recon_s2])))
-#print(mir_eval.separation.bss_eval_sources(np.vstack([wav_gt_s11, wav_gt_s21]), np.vstack([wav_recon_s11, wav_recon_s21])))
-#print(mir_eval.separation.bss_eval_sources(np.vstack([wav_gt_s12, wav_gt_s22]), np.vstack([wav_recon_s12, wav_recon_s22])))

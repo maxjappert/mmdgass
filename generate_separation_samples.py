@@ -7,7 +7,7 @@ import torch
 from matplotlib import pyplot as plt
 
 from functions_prior import MultiModalDataset, PriorDataset
-from separate_new import get_vaes, separate
+from separate import get_vaes, separate
 from separate_video import separate_video
 
 device = 'cuda'

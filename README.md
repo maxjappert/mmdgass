@@ -1,7 +1,11 @@
 
 # Multi-Modal Deep Generative Audio Source Separation
 
-Welcome to the code repository accompanying the MSc thesis **Multi-Modal Deep Generative Audio Source Separation**, supervised by [Dr Brooks Paige](https://tbrx.github.io/). This thesis was written as part of the MSc Machine Learning degree at University College London (UCL). The repository contains the code used to train the models, run the algorithms and conduct the experiments detailed in the thesis, focusing on variational autoencoders (VAEs) applied to the challenge of separating mixed audio signals, with the optional inclusion of visual data to enhance the separation performance.
+<img src="assets/animation.gif" />
+
+Welcome to the code repository accompanying the MSc thesis **Multi-Modal Deep Generative Audio Source Separation**, supervised by [Dr Brooks Paige](https://tbrx.github.io/). This thesis was written in the scope of the MSc Machine Learning degree at University College London (UCL). The repository contains the code used to train the models, run the algorithms and conduct the experiments detailed in the thesis, focusing on variational autoencoders (VAEs) applied to the challenge of separating mixed audio signals, with the optional inclusion of visual data to enhance the separation performance.
+
+Disclaimer: Some of the code in the `models` folder is **not mine**. It is copied from the [Self-supervised BSS via Multi-Encoder AE](https://github.com/webstah/self-supervised-bss-via-multi-encoder-ae) repository. The remaining code was written by me.
 
 ## Repository Structure
 
@@ -35,7 +39,7 @@ Welcome to the code repository accompanying the MSc thesis **Multi-Modal Deep Ge
 ├── vincent_paper_implementation.py       # Implementation of the metrics in Vincent et al. (2006)
 ├── visualise_dataset.py                  # Generates a visual sample image of the datasets
 ├── vae_hp_opti.py                        # Optuna experiment evaluating optimal VAE hyperparameters
-├── separate_new.py                       # Uni-modal BASIS separation scripts
+├── separate.py                       # Uni-modal BASIS separation scripts
 ├── separate_video.py                     # Bi-modal BASIS separation scripts
 ├── print_metric_results.py               # Prints the results from the experiment.py experiment as mean +- standard error
 ├── hp_opti.py                            # Uses optuna's TPE to optimise AE-BSS hyperparameters

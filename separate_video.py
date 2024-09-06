@@ -16,7 +16,7 @@ from torchvision.utils import save_image
 import os
 
 from functions_prior import VAE, PriorDataset, finetune_sigma, train_vae, VideoModel
-from separate_new import get_vaes_rochester
+from separate import get_vaes_rochester
 
 k = 2
 
@@ -277,6 +277,38 @@ def separate_video(gt_m,
                    video_weight=1,
                    device=torch.device('cuda'),
                    gradient_weight=1):
+    """
+    Implementation of Modified BASIS with video included.
+
+    Args:
+        gt_m (torch.Tensor): Mixed signal.
+        video (torch.Tensor): Video as 3D-tensor.
+        hps_stems (dict): Hyperparameters of deep generative priors.
+        hps_video (dict): Hyperparameters of video model.
+        video_model_name (str): Name of video predictor.
+        stem_names (list): List of the abbreviated stem (instrument) names.
+        L (int): Number of iterations per noise level.
+        T (int): Number of noise levels.
+        alpha (float): Mixing coefficient.
+        delta (float): Learning rate.
+        image_h (int): Height of image.
+        image_w (int): Width of image.
+        sigma_start (float): Smallest noise level.
+        sigma_end (float): Largest noise level.
+        stem_indices (list): Indices of the stem types within the image.
+        finetuned (bool): True if the finetuned models shall be used.
+        name (str): Name of the super-VAE.
+        visualise (bool): True if a figure of the separation shall be saved.
+        k (int): Number of sources.
+        constraint_term_weight (int): Weight to the reconstruction term.
+        verbose (bool): True if progress report should be printed.
+        gradient_weight (float): Weight to the gradient.
+        device (str): 'cpu' or 'cuda'.
+        video_weight (float): Weight $\beta$ to the video gradient.
+
+    Returns:
+        list: Separated sources as torch.Tensor each.
+    """
 
     x_dim = image_h * image_w
 

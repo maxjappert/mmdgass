@@ -10,17 +10,28 @@ from torch._dynamo.trace_rules import np
 from nmf import nmf_approx_two_sources
 from functions import get_model, get_non_linear_separation, get_linear_separation
 from functions_prior import PriorDataset
-from separate_new import separate, get_vaes
-
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+from separate import separate, get_vaes
 
 k = 2
 
 
-# stem_indices = [0, 2]
-
 def create_pred_figures(name_vae, device):
+    """
+    Saves a figure for each pair showing the separation attempt by all discussed methods.
+
+    Args:
+        name_vae (str): Name of VAE that will be used for the VAE-based methods. The name of AE-BSS will be derived from this.
+        device (str): 'cpu' or 'cuda'.
+    """
     def create_pred_figure(stem_indices, name_vae, device):
+        """
+        Saves a figure showing the separation attempt by all discussed methods.
+
+        Args:
+            stem_indices (list): The indices to compare.
+            name_vae (str): Name of the VAE.
+            device (str): 'cpu' or 'cuda'.
+        """
         name_separator = f'{name_vae}_separator'
         hps_vae = json.load(open(f'hyperparameters/{name_vae}_stem1.json'))
         image_h = hps_vae['image_h']
@@ -119,6 +130,3 @@ def create_pred_figures(name_vae, device):
                 continue
 
             create_pred_figure([i, j], name_vae, device)
-
-# create_pred_figures('toy', 'cuda')
-# create_pred_figures('musdb', 'cuda')

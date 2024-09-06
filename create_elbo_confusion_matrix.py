@@ -7,13 +7,25 @@ from torch.utils.data import DataLoader
 import pandas as pd
 
 from functions_prior import PriorDataset
-from separate_new import get_vaes
+from separate import get_vaes
 
 import seaborn as sn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 def create_elbo_confusion_matrix(model_name, batch_size=512, temp=1):
+    """
+    Computes and saves the confusion matrix for a given deep generative prior with respect the ELBO.
+
+    Args:
+        model_name (str): Model of interest.
+        batch_size (int): Batch size.
+        temp (float): Temperature scaling parameter.
+
+    Returns:
+        np.ndarray: Confusion matrix.
+    """
     dataset_name = 'toy_dataset' if model_name.__contains__('toy') else 'musdb_18_prior'
     image_h = 64
     image_w = 64
@@ -47,16 +59,9 @@ def create_elbo_confusion_matrix(model_name, batch_size=512, temp=1):
 
     print(confusion_matrix)
 
-    # # go back into exp space
-    # confusion_matrix = np.exp(confusion_matrix)
-
-    # print(confusion_matrix)
-
     # softmax
     confusion_matrix = confusion_matrix - np.max(confusion_matrix, axis=1, keepdims=True)
     confusion_matrix = np.exp(confusion_matrix * temp - np.log(np.sum(np.exp(confusion_matrix * temp), axis=1, keepdims=True)))
-    # confusion_matrix = np.exp(confusion_matrix) / np.sum(np.exp(confusion_matrix), axis=1, keepdims=True)
-    # confusion_matrix = confusion_matrix / np.sum(confusion_matrix, axis=1, keepdims=True)
 
     print(confusion_matrix)
 

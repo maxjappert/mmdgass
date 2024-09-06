@@ -6,17 +6,19 @@ from datetime import datetime
 import mir_eval
 import numpy as np
 import torch
-from jinja2.filters import do_round
-from matplotlib import pyplot as plt
-from torch.utils.data import DataLoader
-from torchvision.utils import save_image
-
-from evaluation_metric_functions import compute_spectral_sdr, compute_spectral_metrics
-from functions import set_seed
 from functions_prior import PriorDataset, MultiModalDataset
 from separate_video import separate_video
 
+
 def evaluate_video_weight(num_samples=10, name_video_model='video_model_raft_resnet', device='cuda'):
+    """
+    Experiment consisting of a grid-search over the video weights $\beta$.
+
+    Args:
+        num_samples (int): Number of samples per $\beta$.
+        name_video_model (str): Name of the video model.
+        device (str): 'cuda' or 'cpu'.
+    """
     # name_vae = sys.argv[1]
     hps_stems = json.load(open(f'hyperparameters/vn_vn.json'))
     hps_video = json.load(open(f'hyperparameters/{name_video_model}.json'))
@@ -40,8 +42,6 @@ def evaluate_video_weight(num_samples=10, name_video_model='video_model_raft_res
 
             now = datetime.now()
             timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S")
-            # print(f'[{timestamp_str}]  Processing {i + 1}/{num_samples}')
-            # to avoid, when the same stem is selected, the same sample
             gt_xs = sample['sources'].to(device)
             video = sample['video'].unsqueeze(dim=0).to(device)
 
@@ -67,6 +67,3 @@ def evaluate_video_weight(num_samples=10, name_video_model='video_model_raft_res
         print(f'{round(np.mean(basis[weight_index, 0, metrics["sdr"], :]), 3)} +- {round(np.std(basis[weight_index, 0, metrics["sdr"], :], ddof=1), 3)}')
         print(f'{round(np.mean(basis[weight_index, 1, metrics["sdr"], :]), 3)} +- {round(np.std(basis[weight_index, 1, metrics["sdr"], :], ddof=1), 3)}')
         print()
-
-
-# evaluate_video_weight(num_samples=50, device='cuda')

@@ -19,9 +19,6 @@ from matplotlib import pyplot as plt
 from torch import optim, nn
 from torch.optim.lr_scheduler import StepLR
 from torchvision import transforms
-from torchvision.utils import save_image
-
-from evaluation_metric_functions import compute_spectral_sdr, compute_spectral_metrics, visualise_predictions
 from models.cnn_multi_enc_ae_2d import ConvolutionalAutoencoderOG
 from models.cnn_multi_enc_ae_2d_spectrograms import ConvolutionalAutoencoder
 from torch.utils.data import Dataset, DataLoader
@@ -557,60 +554,6 @@ metric_index_mapping = {
     'sar': 2,
 }
 
-
-def test(model, dataset_val, visualise=True, name='test', num_samples=100, single_file=True, linear=False,
-         random_visualisation=False, compute_sdr=True):
-    metric_sum = 0
-
-    model.eval()
-
-    if not os.path.exists('images'):
-        os.makedirs('images')
-
-    for running_index in range(num_samples):
-        # Sample random value from test set
-
-        if running_index == 0 and not random_visualisation:
-            sample_index = 1
-            sample = dataset_val[sample_index]
-        else:
-            sample_index = random.randint(0, len(dataset_val) - 1)
-            sample = dataset_val[sample_index]
-
-        x = sample[0].unsqueeze(0).to(device)
-        x_pred, _ = model(x)
-        x_pred = torch.sigmoid(x_pred).squeeze().detach().cpu().numpy()
-
-        #save_spectrogram_to_file(x_pred, f'{name}_mix.png')
-
-        x_i_preds = get_linear_separation(model, sample) if linear else get_non_linear_separation(model, sample)
-
-        if visualise and running_index == 0:
-            if single_file:
-                visualise_predictions(sample[0].squeeze(), [x_i.squeeze() for x_i in sample[1:]], x_pred, x_i_preds, name=name)
-                print(f'{name}.png saved')
-                # print(f'{x_pred.min()}, {x_pred.max()}')
-                # print(f'{sample[0].min()}, {sample[0].max()}')
-            else:
-                save_spectrogram_to_file(x_pred, f'{name}_mix.png')
-                save_spectrogram_to_file(sample[0].squeeze(), f'{name}_mix_gt.png')
-                for l, x_i_pred in enumerate(x_i_preds):
-                    save_spectrogram_to_file(x_i_pred, f'{name}_{l}.png')
-                    save_spectrogram_to_file(sample[l+1].squeeze(), f'{name}_{l}_gt.png')
-
-        #metric_sum += evaluate_separation_ability(x_i_preds, [x_i_gt.squeeze().numpy() for x_i_gt in sample[1:]])
-
-        if compute_sdr:
-            time1 = time.time()
-            metrics = mir_eval.separation.bss_eval_images([x_i_gt.view(-1).numpy() for x_i_gt in sample[1:]], [x_i.reshape(-1) for x_i in x_i_preds])
-            time2 = time.time()
-            # print(f'One metric took {time2 - time1} seconds')
-            sdr = metrics[0]
-            metric_sum += np.mean(sdr)
-
-    return (metric_sum / num_samples) if compute_sdr else None
-
-
 def create_combined_image(S_mix_gt, S1_approx, S2_approx, S1_gt, S2_gt, output_path):
     fig, axes = plt.subplots(3, 2, figsize=(10, 15))
 
@@ -656,6 +599,19 @@ def load_model(name):
     return model
 
 def get_model(name, image_h=64, image_w=64, k=2):
+    """
+    Loads a AE-BSS model from a name only, automatically assigning the right hyperparameters from file.
+
+    Args:
+        name (str): Name of the model to load.
+        image_h (int): Set to 64 usually.
+        image_w (int): Set to 64 usually.
+        k (int): Number of sources.
+
+    Returns:
+        torch model.
+    """
+
     hps_bss = json.load(open(f'hyperparameters/{name}.json'))
 
     model_bss = model_factory(linear=hps_bss['linear'],

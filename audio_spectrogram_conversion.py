@@ -4,13 +4,26 @@ import matplotlib.pyplot as plt
 import scipy
 from PIL import Image
 
-#sample_rate = 44100
 chunk_length = 5  # in seconds
 n_fft = 2048
 hop_length = 512
 
 
 def audio_to_spectrogram(audio, name, save_to_file=False, dest_folder=None, from_file=False, sr=22050):
+    """
+    Converts real-space audio file to spectrogram using librosa.
+
+    Args:
+        audio (str/ndarray): Audio to be converted to spectrogram.
+        name (str): Name of output file.
+        save_to_file (bool): True if you want to save spectrogram to file.
+        dest_folder (Path): Destination folder where spectrogram will be saved if save_to_file is True.
+        from_file (bool): True if initial audio is loaded from file.
+        sr (int): Sample rate in Hz.
+
+    Returns:
+        ndarray, ndarray: Magnitude spectrogram and corresponding phase.
+    """
     if from_file:
         audio, _ = librosa.load(audio, sr=sr)
 
@@ -19,7 +32,7 @@ def audio_to_spectrogram(audio, name, save_to_file=False, dest_folder=None, from
     S_db = librosa.amplitude_to_db(np.abs(S), ref=np.max)
     phase = np.angle(S)
 
-    # Normalize the spectrogram to 0-255
+    # Normalise the spectrogram to 0-255
     S_db_normalized = (S_db + 80) / 80 * 255
     S_db_normalized = S_db_normalized.astype(np.uint8)
 
@@ -30,7 +43,21 @@ def audio_to_spectrogram(audio, name, save_to_file=False, dest_folder=None, from
 
     return S_db_normalized, phase
 
+
 def spectrogram_to_audio(spectrogram, output_filename, phase=None, from_file=False, sr=22050):
+    """
+    Converts a spectrogram to audio.
+
+    Args:
+        spectrogram (str/ndarray): Spectrogram either as file path or numpy array.
+        output_filename (str): File the audio should be saved to.
+        phase (ndarray): Phase information of spectrogram.
+        from_file (bool): True if spectrogram shall be loaded from a file.
+        sr (int): Sample rate in Hz.
+
+    Returns:
+        ndarray: Audio signal in real space.
+    """
     # Load the spectrogram image
     if from_file:
         img = Image.open(f'{spectrogram}').convert('L')
@@ -54,17 +81,8 @@ def spectrogram_to_audio(spectrogram, output_filename, phase=None, from_file=Fal
         assert S_imported.shape == phase.shape, f'{S_imported.shape} mismatched {phase.shape}'
         audio_signal = librosa.istft(S_imported * np.exp(1j * phase))
 
-
     if output_filename is not None:
         # Write the output to a WAV file
         scipy.io.wavfile.write(f'wavs/{output_filename}.wav', sr, np.array(audio_signal * 32767, dtype=np.int16))
 
     return audio_signal * 32767
-
-
-#spectrogram, sr = audio_to_spectrogram('01_Jupiter_vn_vc/AuSep_1_vn_01_Jupiter.wav', save_to_file=True)
-# for dp in [1, 6, 94, 3]:
-#     for i in range(1, 5):
-#         file = f'stem{i}'
-#         spectrogram_to_audio(f'data/musdb_18_prior/train/datapoint{dp}/{file}.png', f'file{dp}_{i}', f'data/musdb_18_prior/train/datapoint{dp}/{file}_phase.npy', from_file=True)
-#

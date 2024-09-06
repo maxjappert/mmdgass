@@ -4,13 +4,10 @@ import traceback
 import optuna
 import torch
 
-from evaluation_metric_functions import compute_spectral_sdr
 from functions import model_factory, CircleTriangleDataset, train, test, TwoSourcesDataset
 
 
 def objective(trial):
-
-    #channel_options = [[2, 4, 8], [4, 8, 16], [8, 16, 32], [16, 32, 64], [32, 64, 128], [64, 128, 256], [24, 48, 96, 144], [16, 32, 64, 128], [16, 32, 64, 128, 256], [24, 48, 96, 144, 196]]
 
     channel_options = [[8, 16], [8, 16, 32], [8, 16, 32, 64], [8, 16, 32, 64, 128], [24, 48, 96, 144], [24, 48, 96, 196], [24, 48, 96, 144, 196], [16, 32, 64, 128, 256]]
 

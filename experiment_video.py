@@ -13,6 +13,17 @@ from separate_video import separate_video
 np.set_printoptions(precision=3, suppress=True)
 
 def print_output(results, k, metric_idx, name, index):
+    """
+    Used for printing the mean +- std.
+
+    Args:
+        results (ndarray): Results tensor used to compute the mean and standard deviation.
+        k (int): Number of sources.
+        metric_idx (int): Index of the metric to print.
+        name (str): Name for formatting.
+        index (int): Maximum sample index.
+
+    """
     for stem_idx in range(k):
         print(
             f'{name} {stem_idx + 1}: {round(np.mean(results[stem_idx, metric_idx, :index+1]), 3)} +- {round(np.std(results[stem_idx, metric_idx, :index+1]), 3)}')
@@ -21,6 +32,15 @@ def print_output(results, k, metric_idx, name, index):
 
 
 def experiment_video(name_video_model, num_samples=100, video_weight=1024, device='cuda'):
+    """
+    Experiment comparing the inclusion of video into BASIS to the performance without. Saves the results to file.
+
+    Args:
+        name_video_model (str): Name of the video classifier.
+        num_samples (int): The total number of samples to be considered.
+        video_weight (float): Denoted as $\beta$ in the thesis.
+        device (str): 'cpu' or 'cuda'. Which device to use.
+    """
     k = 2
     image_h = 64
     image_w = 64
