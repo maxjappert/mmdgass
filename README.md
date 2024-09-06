@@ -1,7 +1,7 @@
 
 # Multi-Modal Deep Generative Audio Source Separation
 
-<img src="assets/animation.gif" />
+<img src="assets/animation5.gif" />
 
 Welcome to the code repository accompanying the MSc thesis **Multi-Modal Deep Generative Audio Source Separation**, supervised by [Dr Brooks Paige](https://tbrx.github.io/). This thesis was written in the scope of the MSc Machine Learning degree at University College London (UCL). The repository contains the code used to train the models, run the algorithms and conduct the experiments detailed in the thesis, focusing on variational autoencoders (VAEs) applied to the challenge of separating mixed audio signals, with the optional inclusion of visual data to enhance the separation performance.
 
